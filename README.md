@@ -105,15 +105,24 @@ Diese Einstellungen müssen im Menü **`Werkzeuge`** exakt so gesetzt sein:
 
 ## WLAN-Zugang eintragen
 
-In der Datei **`config.h`** ganz oben SSID und Passwort eintragen:
+Die Zugangsdaten stehen **bewusst nicht** in `config.h`, sondern in einer
+separaten Datei `secrets.h`, die **nicht** mit ins GitHub-Repo hochgeladen wird.
+So landen deine echten Daten nie versehentlich öffentlich.
 
-```cpp
-const char* WLAN_SSID     = "MeinWLAN";          // Name des WLANs
-const char* WLAN_PASSWORT = "MeinWLANPasswort";  // WLAN-Passwort
-```
+1. Die mitgelieferte Vorlage **`secrets.h.example`** kopieren und die Kopie in
+   **`secrets.h`** umbenennen (im selben Ordner wie der Sketch).
+2. In `secrets.h` die echten Werte eintragen:
+   ```cpp
+   #define GEHEIM_WLAN_SSID     "MeinWLAN"          // Name des WLANs
+   #define GEHEIM_WLAN_PASSWORT "MeinWLANPasswort"  // WLAN-Passwort
+   #define GEHEIM_OTA_PASSWORT  ""                  // optionales OTA-Passwort
+   ```
+
+> `secrets.h` steht in der `.gitignore` – Git ignoriert die Datei, sie kann also
+> nicht aus Versehen committet werden. Eingecheckt wird nur `secrets.h.example`.
 
 Alle weiteren Einstellungen (Intervalle, Auflösung, Schwellenwerte, MQTT) stehen
-ebenfalls in `config.h` und sind dort auf Deutsch kommentiert.
+in `config.h` und sind dort auf Deutsch kommentiert.
 
 ---
 
@@ -230,8 +239,10 @@ USB-Kabel: Neue Firmware lässt sich bequem **über WLAN** hochladen (OTA =
 ### Einstellungen in `config.h`
 
 ```cpp
+// in config.h:
 const char* OTA_HOSTNAME = "garagentor";   // Name in der IDE
-const char* OTA_PASSWORT = "";             // "" = kein Passwort, sonst eintragen
+// in secrets.h (nicht auf GitHub):
+#define GEHEIM_OTA_PASSWORT  ""            // "" = kein Passwort, sonst eintragen
 ```
 
 > **Empfehlung:** Ein OTA-Passwort eintragen, damit niemand sonst im Netzwerk
@@ -345,7 +356,9 @@ Bei jedem bestätigten Zustandswechsel wird dann der Zustand (`ZU`, `OFFEN`,
 | Datei                                | Inhalt                                                      |
 |--------------------------------------|-------------------------------------------------------------|
 | `Garagentor_Zustandserkennung.ino`   | Hauptprogramm: Kamera, WLAN, Webserver, Analyse, Training   |
-| `config.h`                           | **Alle Einstellungen** (WLAN, Kamera, Schwellen, MQTT)      |
+| `config.h`                           | **Alle Einstellungen** (Kamera, Schwellen, Intervalle, MQTT)|
+| `secrets.h.example`                  | Vorlage für Zugangsdaten → kopieren nach `secrets.h`        |
+| `secrets.h`                          | **Echte** WLAN-/OTA-Daten (lokal, per `.gitignore` privat)  |
 | `camera_pins.h`                      | Pin-Belegung der Freenove-Kamera                            |
 | `webpages.h`                         | HTML der Übersichts- und Trainingsseite                     |
 | `README.md`                          | Diese Anleitung                                             |

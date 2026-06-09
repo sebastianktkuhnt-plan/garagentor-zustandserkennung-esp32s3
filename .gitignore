@@ -1,3 +1,9 @@
+# Geheime Zugangsdaten -> NIEMALS auf GitHub! (Vorlage: secrets.h.example)
+/secrets.h
+
+# Lokale Notizen / Memory (nicht teilen)
+/CLAUDE.md
+
 # Arduino IDE Build-Artefakte
 build/
 *.bin

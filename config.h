@@ -8,14 +8,15 @@
 #pragma once
 
 #include "esp_camera.h"   // wird für den Typ "framesize_t" benötigt
+#include "secrets.h"      // ECHTE Zugangsdaten (liegt in .gitignore, nicht auf GitHub)
 
 // ---------------------------------------------------------------------------
 //  1) WLAN-ZUGANGSDATEN
 // ---------------------------------------------------------------------------
-//  Hier die Daten des eigenen Heim-WLANs eintragen.
+//  Die ECHTEN WLAN-Daten stehen in der Datei "secrets.h" (nicht auf GitHub).
 //  ACHTUNG: Der ESP32-S3 unterstützt nur 2,4-GHz-WLAN, KEIN 5 GHz!
-const char* WLAN_SSID     = "MeinWLAN";          // Name (SSID) des WLANs
-const char* WLAN_PASSWORT = "MeinWLANPasswort";  // WLAN-Passwort
+const char* WLAN_SSID     = GEHEIM_WLAN_SSID;       // Name (SSID) – aus secrets.h
+const char* WLAN_PASSWORT = GEHEIM_WLAN_PASSWORT;   // Passwort     – aus secrets.h
 
 // Hostname für mDNS -> Aufruf im Browser auch über  http://garagentor.local
 const char* HOSTNAME = "garagentor";
@@ -30,8 +31,8 @@ const unsigned long WLAN_TIMEOUT_MS = 20000;     // 20 Sekunden
 //  Sollte mit HOSTNAME uebereinstimmen, damit der mDNS-Name eindeutig bleibt.
 const char* OTA_HOSTNAME = "garagentor";
 //  Optionales OTA-Passwort: schuetzt vor unbefugten Updates im Netzwerk.
-//  Leerer String "" = kein Passwort. Aus Sicherheitsgruenden besser etwas eintragen.
-const char* OTA_PASSWORT = "";
+//  Der echte Wert steht in "secrets.h" ("" = kein Passwort).
+const char* OTA_PASSWORT = GEHEIM_OTA_PASSWORT;
 
 // ---------------------------------------------------------------------------
 //  2) ZEIT / NTP  (für die Zeitstempel der Zustandswechsel)
