@@ -1,6 +1,13 @@
 // ===========================================================================
 //  Garagentor-Zustandserkennung mit ESP32-S3-CAM (Freenove ESP32-S3-WROOM)
 // ---------------------------------------------------------------------------
+//  Copyright (C) 2026 sebastianktkuhnt-plan
+//
+//  Dieses Programm ist freie Software: Sie koennen es unter den Bedingungen
+//  der GNU General Public License v3.0 (GPL-3.0), wie von der Free Software
+//  Foundation veroeffentlicht, weitergeben und/oder veraendern. Es wird OHNE
+//  JEDE GEWAEHRLEISTUNG bereitgestellt. Details stehen in der Datei LICENSE.
+// ---------------------------------------------------------------------------
 //  Funktionen:
 //   - WLAN-Verbindung + Weboberflaeche direkt auf dem ESP32 (kein Server noetig)
 //   - MJPEG-Livestream im Browser

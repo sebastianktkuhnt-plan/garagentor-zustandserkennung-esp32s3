@@ -20,6 +20,7 @@ Garage **trainiert** und ist dadurch robust gegen schwieriges Licht und Gegenlic
 - [Optional: MQTT aktivieren](#optional-mqtt-aktivieren)
 - [Troubleshooting](#troubleshooting)
 - [Dateien im Projekt](#dateien-im-projekt)
+- [Lizenz](#lizenz)
 
 ---
 
@@ -353,3 +354,20 @@ Bei jedem bestätigten Zustandswechsel wird dann der Zustand (`ZU`, `OFFEN`,
 `/kalibrierung.dat` (gelernte Referenzwerte), `/letzter_wechsel.jpg` (Foto des
 letzten Wechsels), `/wechsel.txt` (Zeit + Zustand).
 **Auf der SD-Karte:** `/garagentor_log.csv` (Verlaufsprotokoll).
+
+---
+
+## Lizenz
+
+Dieses Projekt steht unter der **GNU General Public License v3.0 (GPL-3.0)** –
+siehe Datei [`LICENSE`](LICENSE).
+
+Kurz gesagt:
+
+- Du darfst den Code **frei nutzen, verändern und weitergeben** – auch kommerziell.
+- Veränderte oder darauf aufbauende Versionen müssen **ebenfalls unter der GPL-3.0
+  offengelegt** werden (kein „Einsacken" als geschlossene, proprietäre Software).
+- Es gibt **keine Gewährleistung** – Nutzung auf eigene Verantwortung.
+
+© 2026 sebastianktkuhnt-plan. „GPL-3.0" ist der maßgebliche Lizenztext; diese
+Zusammenfassung dient nur der Orientierung.
