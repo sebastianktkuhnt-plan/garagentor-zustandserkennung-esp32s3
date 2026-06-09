@@ -595,26 +595,41 @@ static esp_err_t handleStream(httpd_req_t* req) {
   httpd_resp_set_type(req, "multipart/x-mixed-replace;boundary=frame");
   httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
 
+  // Wiederverwendbarer Kopierpuffer im PSRAM (waechst bei Bedarf).
+  // Wichtig: Wir kopieren das JPEG nur KURZ unter dem Mutex und senden es
+  // danach OHNE Mutex. So kann ein langsamer Browser-Client niemals die
+  // Bildanalyse oder die Trainings-Endpunkte blockieren.
+  uint8_t* buf = nullptr;
+  size_t   bufCap = 0;
+
   while (true) {
-    esp_err_t res = ESP_OK;
+    // 1) Frame holen und kopieren (nur hier ist der Kamera-Mutex aktiv)
+    size_t len = 0; bool ok = false;
     xSemaphoreTake(gCamMutex, portMAX_DELAY);
     camera_fb_t* fb = esp_camera_fb_get();
-    if (!fb) {
-      xSemaphoreGive(gCamMutex);
-      res = ESP_FAIL;
-    } else {
-      res = httpd_resp_send_chunk(req, BOUNDARY, strlen(BOUNDARY));
-      if (res == ESP_OK) {
-        int l = snprintf(head, sizeof(head), PART_HEAD, (unsigned)fb->len);
-        res = httpd_resp_send_chunk(req, head, l);
+    if (fb) {
+      if (fb->len > bufCap) {
+        uint8_t* nb = (uint8_t*) ps_realloc(buf, fb->len);
+        if (nb) { buf = nb; bufCap = fb->len; }
       }
-      if (res == ESP_OK) res = httpd_resp_send_chunk(req, (const char*)fb->buf, fb->len);
+      if (buf && bufCap >= fb->len) { memcpy(buf, fb->buf, fb->len); len = fb->len; ok = true; }
       esp_camera_fb_return(fb);
-      xSemaphoreGive(gCamMutex);
     }
+    xSemaphoreGive(gCamMutex);
+    if (!ok) break;                      // Kamerafehler -> Stream beenden
+
+    // 2) Senden ohne Mutex
+    esp_err_t res = httpd_resp_send_chunk(req, BOUNDARY, strlen(BOUNDARY));
+    if (res == ESP_OK) {
+      int l = snprintf(head, sizeof(head), PART_HEAD, (unsigned)len);
+      res = httpd_resp_send_chunk(req, head, l);
+    }
+    if (res == ESP_OK) res = httpd_resp_send_chunk(req, (const char*)buf, len);
     if (res != ESP_OK) break;            // Client hat die Verbindung beendet
+
     vTaskDelay(pdMS_TO_TICKS(60));       // ~15 fps und entlastet die Kamera
   }
+  if (buf) free(buf);
   return ESP_OK;
 }
 
@@ -716,7 +731,7 @@ void initKamera() {
 // ===========================================================================
 void initOTA() {
   ArduinoOTA.setHostname(OTA_HOSTNAME);
-  // Passwort nur setzen, wenn in config.h eines konfiguriert wurde
+  // Passwort nur setzen, wenn in secrets.h eines konfiguriert wurde
   if (strlen(OTA_PASSWORT) > 0) ArduinoOTA.setPassword(OTA_PASSWORT);
 
   ArduinoOTA.onStart([]() {
@@ -776,6 +791,7 @@ void setup() {
   // WLAN verbinden
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(false);
+  WiFi.setAutoReconnect(true);   // bei Verbindungsabbruch automatisch neu verbinden
   WiFi.begin(WLAN_SSID, WLAN_PASSWORT);
   Serial.printf("Verbinde mit WLAN \"%s\" ", WLAN_SSID);
   unsigned long start = millis();
@@ -794,7 +810,7 @@ void setup() {
     // OTA-Updates ueber WLAN aktivieren
     initOTA();
   } else {
-    Serial.println("WLAN NICHT verbunden! Bitte SSID/Passwort in config.h pruefen.");
+    Serial.println("WLAN NICHT verbunden! Bitte SSID/Passwort in secrets.h pruefen.");
     Serial.println("Das Geraet laeuft weiter, ist aber nicht im Netz erreichbar.");
   }
 
